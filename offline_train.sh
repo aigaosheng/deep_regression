@@ -1,0 +1,1 @@
+python test.py --root ../../CorpusRV/EXP --output results_jan3019 --property meradio --model dnn --train ../../CorpusRV/Clean/Split/radioview_201810400_2019012023_feature_meradio.memmap_train --dev ../../CorpusRV/Clean/Split/radioview_201810400_2019012023_feature_meradio.memmap_dev --test ../../CorpusRV/Clean/Split/radioview_201810400_2019012023_feature_meradio.memmap_test

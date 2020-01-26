@@ -1,0 +1,26 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[dev-packages]
+
+[packages]
+unicodecsv = "*"
+pyarrow = "*"
+pandas = "*"
+sklearn = "*"
+azure = "*"
+azure-storage = "*"
+flask = "*"
+flask-restful = "*"
+scikit-learn = "*"
+scipy = "*"
+tensorflow = "*"
+keras = "*"
+pyinstaller = "*"
+"h5py" = "*"
+imbalanced-learn = "*"
+
+[requires]
+python_version = "2.7"
