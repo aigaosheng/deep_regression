@@ -33,6 +33,7 @@ from keras.layers import Dense, Activation, Input, Embedding, LSTM, BatchNormali
 from keras.optimizers import SGD
 from keras.callbacks import ModelCheckpoint
 from sklearn.metrics import mean_squared_error
+from sklearn.preprocessing import StandardScaler, Normalizer, RobustScaler
 
 #from sklearn.preprocessing import Normalizer
 #sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
@@ -56,9 +57,22 @@ def fit(i_train_data_file, o_save_model_file, i_dev_data_file):
     with open(i_train_data_file, 'rb') as fl:
         data_set = pickle.load(fl)
     x_train, y_train = data_set['train'][:2]
-    y_train=np.exp(y_train)
+
+    norm_me = StandardScaler()
+    #norm_me = RobustScaler()
+    norm_me.fit(x_train)
+    x_train = norm_me.transform(x_train)
+
+    norm_me2 = Normalizer(norm = 'l2')
+    norm_me2.fit(x_train)
+    x_train = norm_me2.transform(x_train)
+
+
+    #y_train=np.exp(y_train)
     x_dev, y_dev = data_set['dev'][:2]
     y_dev = y_dev[:, 0]
+    x_dev = norm_me.transform(x_dev)
+    x_dev = norm_me2.transform(x_dev)
 
     print('INFO: %d instances loaded from from %s' % (x_train.shape[0], i_train_data_file))
  
@@ -114,7 +128,7 @@ def fit(i_train_data_file, o_save_model_file, i_dev_data_file):
     with open(tempfile_name, 'wt') as oTempLog:
         json.dump(history.history, oTempLog, indent=2)
     '''
-    return gDnnModel, None# history.history['val_' + nnConfig['val_metric']]
+    return gDnnModel, [norm_me, norm_me2], None# history.history['val_' + nnConfig['val_metric']]
 
 
 def addUserDefinedMetric():
@@ -228,13 +242,14 @@ def scoreReport(y_truth, y_predict):
 
 #test
 if __name__ == '__main__':
-    gmodel, hs = fit('','','')
+    gmodel, norm_me, hs = fit('','','')
 
     i_train_data_file = '/home/gao/Work/aifintech/data/feat/美元兑人民币.pkl'
     with open(i_train_data_file, 'rb') as fl:
         data_set = pickle.load(fl)
     x_test, y_test = data_set['test'][:2]
     y_test = y_test[:, 0]
+    x_test = norm_me[1].transform(norm_me[0].transform(x_test))
     y_pred = gmodel.predict(x_test)
     score_dev = mean_squared_error(y_pred, y_test)
     res = list(zip(y_pred, y_test))

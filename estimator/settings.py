@@ -16,13 +16,13 @@ DEBUG = False
 DNN_CONFIG = {
         'model_type': 'dnn', #'dnn', #'embed'
         'meta_layer_dim': 64, #[64]*2+[32], 256, #512, #set layer size for meta feature
-        'layer_stack': [32, 16,], #[64] * 4,
-        'is_batch_norm': True, #if True, use batch_normalize
-        'dropout_rate': None, #0.1, #if None, not use dropout. other must be value in 0.0-1.0
+        'layer_stack': [32, ], #[64] * 4,
+        'is_batch_norm': False, #if True, use batch_normalize
+        'dropout_rate': 0., #0.1, #if None, not use dropout. other must be value in 0.0-1.0
         'i_dim': 0,
         'o_dim': 1,
-        'learning_rate': 0.00001 * 1,
-        'n_epoch': 30,
+        'learning_rate': 0.01 * 1,
+        'n_epoch': 20*5,
         'n_batch_size': 32,
         'activation_i': 'relu', #tanh', #'relu', #internal layer
         'activation_o': 'relu', #'relu', #internal layer
