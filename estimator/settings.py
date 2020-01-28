@@ -14,15 +14,16 @@ Date: Jan.17, 2019
 DEBUG = False
 
 DNN_CONFIG = {
+        'is_log': True,
         'model_type': 'dnn', #'dnn', #'embed'
         'meta_layer_dim': 64, #[64]*2+[32], 256, #512, #set layer size for meta feature
-        'layer_stack': [32, ], #[64] * 4,
+        'layer_stack': [64*2, 64, 32, ], #[64] * 4,
         'is_batch_norm': False, #if True, use batch_normalize
         'dropout_rate': 0., #0.1, #if None, not use dropout. other must be value in 0.0-1.0
         'i_dim': 0,
         'o_dim': 1,
-        'learning_rate': 0.01 * 1,
-        'n_epoch': 20*5,
+        'learning_rate': 0.005 * 1,
+        'n_epoch': 1000,
         'n_batch_size': 32,
         'activation_i': 'relu', #tanh', #'relu', #internal layer
         'activation_o': 'relu', #'relu', #internal layer
@@ -48,6 +49,3 @@ CHECKPOINT_MODEL_MODE = 'min'
 CHECKPOINT_MODEL_PERIOD = 1
 REMOVE_CHECKPOINT_MODEL = True #if true, remove checkpoint models after best model is chosen and saved
 
-SEQ2INST_PARAM = {
-    'is_log_pv_y': False,
-}

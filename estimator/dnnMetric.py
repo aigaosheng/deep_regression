@@ -28,7 +28,7 @@ def smapeLoss(y_true, y_pred):
     '''
     df = K.abs(y_true - y_pred)
     #add 1.0 / 3.0 to avoid overfitting, and also improve performance
-    if settings.SEQ2INST_PARAM['is_log_pv_y']:
+    if settings.DNN_CONFIG['is_log']:
         sf = y_true + y_pred + 1.0 #K.epsilon() # 2.0 #K.mean(y_true, axis = -1)
     else:
         sf = y_true + y_pred + 3.0 #K.epsilon() # 2.0 #K.mean(y_true, axis = -1)
@@ -40,7 +40,7 @@ def smapeMetric(y_true, y_pred):
     '''
     define smape (Symmetric Mean Absolute Percent Error) for evluating model
     '''
-    if settings.SEQ2INST_PARAM['is_log_pv_y']:
+    if settings.DNN_CONFIG['is_log']:
         y_true = K.exp(y_true) - 1.
         y_pred = K.exp(y_pred) - 1.
     df = K.abs(y_true - y_pred)

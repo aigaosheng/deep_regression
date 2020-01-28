@@ -56,23 +56,28 @@ def fit(i_train_data_file, o_save_model_file, i_dev_data_file):
     i_train_data_file = '/home/gao/Work/aifintech/data/feat/美元兑人民币.pkl'
     with open(i_train_data_file, 'rb') as fl:
         data_set = pickle.load(fl)
+
     x_train, y_train = data_set['train'][:2]
+    y_train = y_train[:, 0]
+    if settings.DNN_CONFIG['is_log']:
+        y_train = np.log(y_train)
 
     norm_me = StandardScaler()
-    #norm_me = RobustScaler()
     norm_me.fit(x_train)
-    x_train = norm_me.transform(x_train)
+    #x_train = norm_me.transform(x_train)
 
-    norm_me2 = Normalizer(norm = 'l2')
+    norm_me2 = Normalizer(norm = 'l1')
     norm_me2.fit(x_train)
-    x_train = norm_me2.transform(x_train)
+    #x_train = norm_me2.transform(x_train)
 
 
     #y_train=np.exp(y_train)
     x_dev, y_dev = data_set['dev'][:2]
     y_dev = y_dev[:, 0]
-    x_dev = norm_me.transform(x_dev)
-    x_dev = norm_me2.transform(x_dev)
+    if settings.DNN_CONFIG['is_log']:
+        y_dev = np.log(y_dev)
+    #x_dev = norm_me.transform(x_dev)
+    #x_dev = norm_me2.transform(x_dev)
 
     print('INFO: %d instances loaded from from %s' % (x_train.shape[0], i_train_data_file))
  
@@ -123,12 +128,14 @@ def fit(i_train_data_file, o_save_model_file, i_dev_data_file):
         history = gDnnModel.fit(x_train, y_train, epochs = nnConfig['n_epoch'], batch_size = nnConfig['n_batch_size'], validation_split = nnConfig['validation_split'], callbacks = callbacks_list)
     #print(history.history)
 
+    bestModel = getBestModelFromHistory(save_model, history.history['val_' + nnConfig['val_metric']])
+
     #save training log to file
     '''tempfile_name = 'train_' + str(random.randint(0,100)) + '.log'
     with open(tempfile_name, 'wt') as oTempLog:
         json.dump(history.history, oTempLog, indent=2)
     '''
-    return gDnnModel, [norm_me, norm_me2], None# history.history['val_' + nnConfig['val_metric']]
+    return bestModel, [norm_me, norm_me2], None# history.history['val_' + nnConfig['val_metric']]
 
 
 def addUserDefinedMetric():
@@ -249,8 +256,12 @@ if __name__ == '__main__':
         data_set = pickle.load(fl)
     x_test, y_test = data_set['test'][:2]
     y_test = y_test[:, 0]
-    x_test = norm_me[1].transform(norm_me[0].transform(x_test))
+    #x_test = norm_me[1].transform(norm_me[0].transform(x_test))
+    #x_test = norm_me[0].transform(x_test)
     y_pred = gmodel.predict(x_test)
+
+    if settings.DNN_CONFIG['is_log']:
+        y_pred = np.exp(y_pred)
     score_dev = mean_squared_error(y_pred, y_test)
     res = list(zip(y_pred, y_test))
     print(res[:4])
