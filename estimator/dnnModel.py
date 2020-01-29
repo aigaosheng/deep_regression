@@ -53,12 +53,12 @@ def fit(i_train_data_file, o_save_model_file, i_dev_data_file):
         topic_type: method to cluster training instances. If None, using generic model
     '''
 
-    i_train_data_file = '/home/gao/Work/aifintech/data/feat/美元兑人民币.pkl'
+    #i_train_data_file = '/home/gao/Work/aifintech/data/feat/美元兑人民币.pkl'
     with open(i_train_data_file, 'rb') as fl:
         data_set = pickle.load(fl)
 
     x_train, y_train = data_set['train'][:2]
-    y_train = y_train[:, 0]
+    #y_train = y_train[:, 0]
     if settings.DNN_CONFIG['is_log']:
         y_train = np.log(y_train)
 
@@ -73,7 +73,7 @@ def fit(i_train_data_file, o_save_model_file, i_dev_data_file):
 
     #y_train=np.exp(y_train)
     x_dev, y_dev = data_set['dev'][:2]
-    y_dev = y_dev[:, 0]
+    #y_dev = y_dev[:, 0]
     if settings.DNN_CONFIG['is_log']:
         y_dev = np.log(y_dev)
     #x_dev = norm_me.transform(x_dev)
@@ -249,13 +249,15 @@ def scoreReport(y_truth, y_predict):
 
 #test
 if __name__ == '__main__':
-    gmodel, norm_me, hs = fit('','','')
-
-    i_train_data_file = '/home/gao/Work/aifintech/data/feat/美元兑人民币.pkl'
+ 
+    #i_train_data_file = '/home/gao/Work/aifintech/data/feat/美元兑人民币.pkl'
+    i_train_data_file = '/home/gao/Work/aifintech/data/feat/pmi.pkl'
+    gmodel, norm_me, hs = fit(i_train_data_file,'','')
+    
     with open(i_train_data_file, 'rb') as fl:
         data_set = pickle.load(fl)
     x_test, y_test = data_set['test'][:2]
-    y_test = y_test[:, 0]
+    #y_test = y_test[:, 0]
     #x_test = norm_me[1].transform(norm_me[0].transform(x_test))
     #x_test = norm_me[0].transform(x_test)
     y_pred = gmodel.predict(x_test)
