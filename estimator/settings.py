@@ -17,15 +17,15 @@ DNN_CONFIG = {
         'is_log': True,
         'model_type': 'dnn', #'dnn', #'embed'
         'meta_layer_dim': 64, #[64]*2+[32], 256, #512, #set layer size for meta feature
-        'layer_stack': [64, 32, 16], #[64] * 4,
+        'layer_stack': [32, 16, 8], #[64] * 4,
         'is_batch_norm': False, #if True, use batch_normalize
         'dropout_rate': 0., #0.1, #if None, not use dropout. other must be value in 0.0-1.0
         'i_dim': 0,
         'o_dim': 2,
-        'learning_rate': 0.005 * 1,
+        'learning_rate': 0.0005* 1,
         'n_epoch': 100,
-        'n_batch_size': 32,
-        'activation_i': 'relu', #tanh', #'relu', #internal layer
+        'n_batch_size': 16*2,
+        'activation_i': 'relu', #'relu', #'relu', #internal layer
         'activation_o': 'relu', #'relu', #internal layer
         'n_internal_layer': 4, #4, #number of dense internal layers
         'is_continue_train': False, #True: if a model already exists in the model-path fold, start train from the model as intialization. False: train from random intialization 

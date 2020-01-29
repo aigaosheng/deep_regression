@@ -88,7 +88,7 @@ def fit(i_train_data_file, o_save_model_file, i_dev_data_file):
     #    raise Exception('Warning: must set save model file names')
     #add
     model_name = 'me_model.pkl'
-    save_model = '/home/gao/Work/deep_regression/exp/exp'
+    save_model = '/home/gao/Work/deep_regression/exp/model_fin'
 
 
     nnConfig = settings.DNN_CONFIG
@@ -253,7 +253,7 @@ if __name__ == '__main__':
     #i_train_data_file = '/home/gao/Work/aifintech/data/feat/美元兑人民币.pkl'
     i_train_data_file = '/home/gao/Work/aifintech/data/feat/pmi.pkl'
     gmodel, norm_me, hs = fit(i_train_data_file,'','')
-    
+
     with open(i_train_data_file, 'rb') as fl:
         data_set = pickle.load(fl)
     x_test, y_test = data_set['test'][:2]
@@ -266,6 +266,6 @@ if __name__ == '__main__':
         y_pred = np.exp(y_pred)
     score_dev = mean_squared_error(y_pred, y_test)
     res = list(zip(y_pred, y_test))
-    print(res[:4])
+    print(res[-4:])
     print('MSE: {}'.format(score_dev))
 
