@@ -42,6 +42,20 @@ from evalMetric import getMetric
 import settings
 from dnnMetric import METRIC_LIST
 
+def feat_tune(feat_pipline, x_train):
+    feat_model = []
+    for f in feat_pipline:
+        feat_model.append(f.fit(x_train))
+        x_train = feat_model[-1].transform(x_train)
+    return feat_model
+
+def feat_transform(feat_model, x_feat):
+    for f in feat_model:
+        x_feat = f.transform(x_feat)
+    return x_feat
+
+is_feature_tuning = True
+
 def fit(i_train_data_file, o_save_model_file, i_dev_data_file):
     '''
     automatic tuning model using dev data set
@@ -62,12 +76,19 @@ def fit(i_train_data_file, o_save_model_file, i_dev_data_file):
     if settings.DNN_CONFIG['is_log']:
         y_train = np.log(y_train)
 
-    norm_me = StandardScaler()
-    norm_me.fit(x_train)
+    if is_feature_tuning:
+        feat_pipline = [StandardScaler(), Normalizer(norm = 'l2')]
+        feat_model =  feat_tune(feat_pipline, x_train)
+        x_train = feat_transform(feat_model, x_train)
+    else:
+        feat_model = None
+    
+    #norm_me = StandardScaler()
+    #feat_pipline.append(norm_me)
+    #norm_me2 = Normalizer(norm = 'l2')
+    #norm_me.fit(x_train)
+    #norm_me2.fit(x_train)
     #x_train = norm_me.transform(x_train)
-
-    norm_me2 = Normalizer(norm = 'l1')
-    norm_me2.fit(x_train)
     #x_train = norm_me2.transform(x_train)
 
 
@@ -76,6 +97,9 @@ def fit(i_train_data_file, o_save_model_file, i_dev_data_file):
     #y_dev = y_dev[:, 0]
     if settings.DNN_CONFIG['is_log']:
         y_dev = np.log(y_dev)
+
+    if is_feature_tuning:
+        x_dev = feat_transform(feat_model, x_dev)
     #x_dev = norm_me.transform(x_dev)
     #x_dev = norm_me2.transform(x_dev)
 
@@ -135,7 +159,7 @@ def fit(i_train_data_file, o_save_model_file, i_dev_data_file):
     with open(tempfile_name, 'wt') as oTempLog:
         json.dump(history.history, oTempLog, indent=2)
     '''
-    return bestModel, [norm_me, norm_me2], None# history.history['val_' + nnConfig['val_metric']]
+    return bestModel, feat_model, None# history.history['val_' + nnConfig['val_metric']]
 
 
 def addUserDefinedMetric():
@@ -192,7 +216,8 @@ def getBestModelFromHistory(checkpoint_model_files, dev_valid_value):
     best_epoch = np.argmin(dev_valid_value) + 1
     print(dev_valid_value)
     print(checkpoint_model_files + '-%02d-?.*.hdf5'%best_epoch)
-    model_file_list = glob.glob(checkpoint_model_files + '-%02d-?.*.hdf5'%best_epoch)
+    #model_file_list = glob.glob(checkpoint_model_files + '-%02d-?.*.hdf5'%best_epoch)
+    model_file_list = glob.glob(checkpoint_model_files + '-%02d-*.*.hdf5'%best_epoch)
     print(model_file_list)
     if len(model_file_list) != 1:
         raise Exception('Warning: model name has same epoch')
@@ -203,7 +228,8 @@ def getBestModelFromHistory(checkpoint_model_files, dev_valid_value):
     shutil.copyfile(best_model, checkpoint_model_files)
     #remove checkpoint files
     if settings.REMOVE_CHECKPOINT_MODEL:
-        model_file_list = glob.glob(checkpoint_model_files + '-*-?.*.hdf5')
+        #model_file_list = glob.glob(checkpoint_model_files + '-*-?.*.hdf5')
+        model_file_list = glob.glob(checkpoint_model_files + '-*-*.*.hdf5')
         for name in model_file_list:
             os.remove(name)
 
@@ -251,12 +277,21 @@ def scoreReport(y_truth, y_predict):
 if __name__ == '__main__':
  
     #i_train_data_file = '/home/gao/Work/aifintech/data/feat/美元兑人民币.pkl'
-    i_train_data_file = '/home/gao/Work/aifintech/data/feat/pmi.pkl'
-    gmodel, norm_me, hs = fit(i_train_data_file,'','')
+    #i_train_data_file = '/home/gao/Work/aifintech/data/feat/pmi.pkl'
+    #i_train_data_file = '/home/gao/Work/aifintech/data/feat/cpi.pkl'
+    #i_train_data_file = '/home/gao/Work/aifintech/data/feat/gold.pkl'
+    #i_train_data_file = '/home/gao/Work/aifintech/data/feat/十年国开债中债估值.pkl'
+    #i_train_data_file = '/home/gao/Work/aifintech/data/feat/白银.pkl'
+    i_train_data_file = '/home/gao/Work/aifintech/data/feat/社会融资规模存量.pkl'
+    
+    gmodel, feat_model, hs = fit(i_train_data_file,'','')
 
     with open(i_train_data_file, 'rb') as fl:
         data_set = pickle.load(fl)
     x_test, y_test = data_set['test'][:2]
+    if is_feature_tuning:
+        x_test = feat_transform(feat_model, x_test)
+
     #y_test = y_test[:, 0]
     #x_test = norm_me[1].transform(norm_me[0].transform(x_test))
     #x_test = norm_me[0].transform(x_test)
