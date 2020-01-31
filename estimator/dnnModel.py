@@ -25,6 +25,7 @@ import tensorflow as tf
 from keras import backend as K, regularizers
 import json
 import glob, shutil
+import pandas as pd
 
 
 import keras
@@ -275,14 +276,15 @@ def scoreReport(y_truth, y_predict):
 
 #test
 if __name__ == '__main__':
- 
+    topic = '十年国开债中债估值'
     #i_train_data_file = '/home/gao/Work/aifintech/data/feat/美元兑人民币.pkl'
     #i_train_data_file = '/home/gao/Work/aifintech/data/feat/pmi.pkl'
     #i_train_data_file = '/home/gao/Work/aifintech/data/feat/cpi.pkl'
-    #i_train_data_file = '/home/gao/Work/aifintech/data/feat/gold.pkl'
+    #i_train_data_file = '/home/gao/Work/aifintech/data/feat/黄金.pkl'
     #i_train_data_file = '/home/gao/Work/aifintech/data/feat/十年国开债中债估值.pkl'
     #i_train_data_file = '/home/gao/Work/aifintech/data/feat/白银.pkl'
-    i_train_data_file = '/home/gao/Work/aifintech/data/feat/社会融资规模存量.pkl'
+    #i_train_data_file = '/home/gao/Work/aifintech/data/feat/社会融资规模存量.pkl'
+    i_train_data_file = '/home/gao/Work/aifintech/data/feat/{}.pkl'.format(topic)
     
     gmodel, feat_model, hs = fit(i_train_data_file,'','')
 
@@ -300,6 +302,14 @@ if __name__ == '__main__':
     if settings.DNN_CONFIG['is_log']:
         y_pred = np.exp(y_pred)
     score_dev = mean_squared_error(y_pred, y_test)
+
+    result_df = pd.DataFrame(columns = ['ds', 'actual', 'predict'])
+    result_df['ds'] = data_set['test'][2]
+    result_df['actual'], result_df['predict'] = y_test, y_pred
+
+    result_file = '/home/gao/Work/deep_regression/exp/result/{}_dnn'.format(topic) + '_test.xlsx'
+    result_df.to_excel(result_file)
+
     res = list(zip(y_pred, y_test))
     print(res[-4:])
     print('MSE: {}'.format(score_dev))

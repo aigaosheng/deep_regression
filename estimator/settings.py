@@ -17,13 +17,13 @@ DNN_CONFIG = {
         'is_log': True, #True,
         'model_type': 'dnn', #'dnn', #'embed'
         'meta_layer_dim': 64, #[64]*2+[32], 256, #512, #set layer size for meta feature
-        'layer_stack': [32, 16, 8,], # [32, 16, 8], #[64] * 4,
+        'layer_stack': [8, 2], # [32, 16, 8], #[64] * 4,
         'is_batch_norm': False, #if True, use batch_normalize
         'dropout_rate': 0., #0.1, #if None, not use dropout. other must be value in 0.0-1.0
         'i_dim': 0,
         'o_dim': 1,
-        'learning_rate': 0.005* 1,
-        'n_epoch': 100*2*2,
+        'learning_rate': 0.005* 2,
+        'n_epoch': 100*1,
         'n_batch_size': 16*2,
         'activation_i': 'relu', #'relu', #'relu', #internal layer
         'activation_o': 'relu', #'relu', #'relu', #internal layer
